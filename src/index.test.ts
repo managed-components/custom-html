@@ -15,16 +15,10 @@ describe('custom-html works correctly', () => {
     referer: '',
     ip: '127.0.0.1',
     url: new URL('http://127.0.0.1:1337'),
-    fetch: () => undefined,
-    set: () => undefined,
     execute: jsString => {
       executedJS.push(jsString)
       return true
     },
-    return: () => {},
-    get: () => undefined,
-    attachEvent: () => {},
-    detachEvent: () => {},
   }
   handler(fakeEvent)
   it('executes html injection', () => {
