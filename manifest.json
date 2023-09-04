@@ -1,0 +1,12 @@
+{
+  "name": "Custom HTML",
+  "namespace": "custom-html",
+  "description": "A Managed Component that injects HTML on your page",
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "execute_unsafe_scripts": {
+      "description": "This permission is used to facilitate better a user experience.",
+      "required": true
+    }
+  }
+}
