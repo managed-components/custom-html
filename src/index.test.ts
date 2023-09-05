@@ -5,7 +5,9 @@ describe('custom-html works correctly', () => {
   const executedJS: string[] = []
   const fakeEvent = new Event('pageview', {}) as MCEvent
   fakeEvent.payload = {
-    htmlCode: `<script>console.log("Success!")</script>`,
+    htmlCode: `<p>some text</p>
+      <script>console.log('Log from MC')</script>
+      <script src="./src"></script>`,
   }
   fakeEvent.client = {
     emitter: 'browser',
@@ -22,9 +24,13 @@ describe('custom-html works correctly', () => {
   }
   handler(fakeEvent)
   it('executes html injection', () => {
-    expect(executedJS).toHaveLength(1)
+    expect(executedJS).toHaveLength(3)
     expect(executedJS[0]).toEqual(
-      `zaraz.i(\`${escape(fakeEvent.payload.htmlCode)}\`);`
+      `const d = document.createElement('div');d.innerHTML = \`<p>some text</p>\`;document.body.appendChild(d);`
+    )
+    expect(executedJS[1]).toEqual(`console.log('Log from MC')`)
+    expect(executedJS[2]).toEqual(
+      `const el = document.createElement('script');Object.entries(JSON.parse(\`{"src":"./src"}\`)).forEach(([k, v]) => {el.setAttribute(k, v);});document.head.appendChild(el);`
     )
   })
 })
