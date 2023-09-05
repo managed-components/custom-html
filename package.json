@@ -1,5 +1,5 @@
 {
-  "name": "custom-html",
+  "name": "@managed-components/custom-html",
   "version": "1.0.0",
   "description": "A Managed Component that injects HTML on your page",
   "main": "dist/index.js",
@@ -10,7 +10,8 @@
     "build": "npm run test && npm run lint && npm run typecheck && npm run bundle",
     "typecheck": "tsc --project tsconfig.build.json --noEmit",
     "test": "vitest run --globals",
-    "test:dev": "vitest --globals"
+    "test:dev": "vitest --globals",
+    "release": "npm run build && npm version patch && npm publish"
   },
   "keywords": [
     "webcm",
