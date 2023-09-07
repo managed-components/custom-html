@@ -47,5 +47,5 @@ export const handler = ({ payload, client }: MCEvent) => {
 }
 
 export default async function (manager: Manager) {
-  manager.addEventListener('pageview', handler)
+  manager.addEventListener('event', handler)
 }
