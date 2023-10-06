@@ -1,1 +1,9 @@
 src
+.eslintrc.js
+.github
+.prettierrc
+assets/html.svg
+coverage/*
+esbuild.js
+tsconfig.json
+tsconfig.build.json
