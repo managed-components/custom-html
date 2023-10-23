@@ -6,6 +6,27 @@ type TElement = {
   content?: string | null
 }
 
+// see https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types#textjavascript
+const JS_MIME_TYPES = [
+  '',
+  'text/javascript',
+  'application/javascript',
+  'application/ecmascript',
+  'application/x-ecmascript',
+  'application/x-javascript',
+  'text/ecmascript',
+  'text/javascript1.0',
+  'text/javascript1.1',
+  'text/javascript1.2',
+  'text/javascript1.3',
+  'text/javascript1.4',
+  'text/javascript1.5',
+  'text/jscript',
+  'text/livescript',
+  'text/x-ecmascript',
+  'text/x-javascript',
+]
+
 const headTagAppender = (tag: string, attributes: TElement['attributes']) =>
   `const el = document.createElement('${tag}');Object.entries(JSON.parse(\`${JSON.stringify(
     attributes
@@ -16,8 +37,10 @@ export const handler = ({ payload, client }: MCEvent) => {
     const $ = cheerio.load(payload.htmlCode, null, false)
     const scripts: TElement[] = []
     $('script').each((_, el) => {
-      scripts.push({ attributes: el.attribs, content: $(el).html() })
-      $(el).remove()
+      if (!el.attribs.type || JS_MIME_TYPES.includes(el.attribs.type)) {
+        scripts.push({ attributes: el.attribs, content: $(el).html() })
+        $(el).remove()
+      }
     })
 
     const links: TElement[] = []

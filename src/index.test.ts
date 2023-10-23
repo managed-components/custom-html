@@ -7,7 +7,9 @@ describe('custom-html works correctly', () => {
   fakeEvent.payload = {
     htmlCode: `<p>some text</p>
       <script>console.log('Log from MC')</script>
-      <script src="./src"></script>`,
+      <script src="./src"></script>
+      <script type="application/json">{}</script>
+`,
   }
   fakeEvent.client = {
     emitter: 'browser',
@@ -26,7 +28,10 @@ describe('custom-html works correctly', () => {
   it('executes html injection', () => {
     expect(executedJS).toHaveLength(3)
     expect(executedJS[0]).toEqual(
-      `const d = document.createElement('div');d.innerHTML = \`<p>some text</p>\`;document.body.appendChild(d);`
+      "const d = document.createElement('div');d.innerHTML = `<p>some text</p>\n" +
+        '      \n' +
+        '      \n' +
+        '      <script type="application/json">{}</script>`;document.body.appendChild(d);'
     )
     expect(executedJS[1]).toEqual(`console.log('Log from MC')`)
     expect(executedJS[2]).toEqual(
