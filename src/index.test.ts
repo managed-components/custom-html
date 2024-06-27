@@ -2,7 +2,7 @@ import { handler } from './index'
 import { MCEvent } from '@managed-components/types'
 
 describe('custom-html', () => {
-  it('executes html injection', () => {
+  it.only('executes html injection', () => {
     const executedJS: string[] = []
     const fakeEvent = new Event('pageview', {}) as MCEvent
     fakeEvent.payload = {
@@ -34,8 +34,8 @@ describe('custom-html', () => {
         '      <script type="application/json">{}</script>`;document.body.appendChild(d);'
     )
     expect(executedJS[1]).toEqual(`console.log('Log from MC')`)
-    expect(executedJS[2]).toEqual(
-      `const el = document.createElement('script');Object.entries(JSON.parse(\`{"src":"./src"}\`)).forEach(([k, v]) => {el.setAttribute(k, v);});document.head.appendChild(el);`
+    expect(executedJS[2]).toMatch(
+      /^const el = document.createElement\('script'\);Object.entries\(JSON.parse\(decodeURIComponent\(`%7B%22src%22%3A%22.%2Fsrc%22%2C%22onload%22%3A%22%7Bdocument.dispatchEvent\(new%20Event\(%5C%22loaded-([a-f0-9-]+)%5C%22\)\)%7D%22%2C%22order-id%22%3A%22([a-f0-9-]+)%22%7D`\)\)\).forEach\(\(\[k, v]\) => {el.setAttribute\(k, v\);}\);document.head.appendChild\(el\);$/
     )
   })
 
