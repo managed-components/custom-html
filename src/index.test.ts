@@ -26,6 +26,7 @@ describe('custom-html', () => {
       },
     }
     handler(fakeEvent)
+    console.log({executedJS});
     expect(executedJS).toHaveLength(3)
     expect(executedJS[0]).toEqual(
       "const d = document.createElement('div');d.innerHTML = `<p>some text</p>\n" +
