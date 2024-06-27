@@ -28,9 +28,9 @@ const JS_MIME_TYPES = [
 ]
 
 const headTagAppender = (tag: string, attributes: TElement['attributes']) =>
-  `const el = document.createElement('${tag}');Object.entries(JSON.parse(\`${JSON.stringify(
-    attributes
-  )}\`)).forEach(([k, v]) => {el.setAttribute(k, v);});document.head.appendChild(el);`
+  `const el = document.createElement('${tag}');Object.entries(JSON.parse(decodeURIComponent(\`${encodeURIComponent(
+    JSON.stringify(attributes)
+  )}\`))).forEach(([k, v]) => {el.setAttribute(k, v);});document.head.appendChild(el);`
 
 export const handler = ({ payload, client }: MCEvent) => {
   try {
@@ -59,10 +59,31 @@ export const handler = ({ payload, client }: MCEvent) => {
       client.execute(headTagAppender('link', attributes))
     })
 
+    const wait_for: string[] = []
     scripts.forEach(({ content, attributes }) => {
       if (attributes?.src) {
+        if (!attributes?.onload) {
+          attributes.onload = ''
+        }
+        if (!attributes.async || attributes.defer) {
+          const order_id = crypto.randomUUID()
+          attributes['order-id'] = order_id
+          wait_for.push(order_id)
+          attributes.onload += `{document.dispatchEvent(new Event("loaded-${order_id}"))}`
+        }
         client.execute(headTagAppender('script', attributes))
       } else if (content) {
+        if (wait_for.length) {
+          content = `{const loaded = ${JSON.stringify(
+            Object.fromEntries(wait_for.map(id => [id, false]))
+          )};
+let called = false;
+const call_if_ready = ()=>{if(!called && Object.values(loaded).every(e=>e)){{${content}}; called = true}};
+${wait_for.map(
+  id =>
+    `document.addEventListener("loaded-${id}", ()=>{loaded["${id}"] = true; call_if_ready()})`
+)}}`
+        }
         client.execute(content)
       }
     })
