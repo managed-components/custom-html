@@ -2,7 +2,7 @@ import { handler } from './index'
 import { MCEvent } from '@managed-components/types'
 
 describe('custom-html', () => {
-  it.only('executes html injection', () => {
+  it('executes html injection', () => {
     const executedJS: string[] = []
     const fakeEvent = new Event('pageview', {}) as MCEvent
     fakeEvent.payload = {
