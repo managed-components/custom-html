@@ -1,5 +1,6 @@
 import { Manager, MCEvent } from '@managed-components/types'
 import * as cheerio from 'cheerio'
+import { postponeScript } from './postponeScript'
 
 type TElement = {
   attributes: { [name: string]: string }
@@ -28,9 +29,9 @@ const JS_MIME_TYPES = [
 ]
 
 const headTagAppender = (tag: string, attributes: TElement['attributes']) =>
-  `const el = document.createElement('${tag}');Object.entries(JSON.parse(\`${JSON.stringify(
-    attributes
-  )}\`)).forEach(([k, v]) => {el.setAttribute(k, v);});document.head.appendChild(el);`
+  `const el = document.createElement('${tag}');Object.entries(JSON.parse(decodeURIComponent(\`${encodeURIComponent(
+    JSON.stringify(attributes)
+  )}\`))).forEach(([k, v]) => {el.setAttribute(k, v);});document.head.appendChild(el);`
 
 export const handler = ({ payload, client }: MCEvent) => {
   try {
@@ -59,10 +60,23 @@ export const handler = ({ payload, client }: MCEvent) => {
       client.execute(headTagAppender('link', attributes))
     })
 
+    const idsOfScriptsToAwait: string[] = []
     scripts.forEach(({ content, attributes }) => {
       if (attributes?.src) {
+        if (!attributes?.onload) {
+          attributes.onload = ''
+        }
+        if (!attributes.async || attributes.defer) {
+          const scriptID = crypto.randomUUID()
+          attributes['order-id'] = scriptID
+          idsOfScriptsToAwait.push(scriptID)
+          attributes.onload += `{document.dispatchEvent(new Event("loaded-${scriptID}"))}`
+        }
         client.execute(headTagAppender('script', attributes))
       } else if (content) {
+        if (idsOfScriptsToAwait.length) {
+          content = postponeScript(idsOfScriptsToAwait, content)
+        }
         client.execute(content)
       }
     })
