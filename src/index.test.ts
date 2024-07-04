@@ -1,6 +1,11 @@
 import { handler } from './index'
 import { MCEvent } from '@managed-components/types'
 
+import crypto from 'crypto'
+if (!global.crypto) {
+  vi.stubGlobal('crypto', crypto)
+}
+
 describe('custom-html', () => {
   it('executes html injection', () => {
     const executedJS: string[] = []
@@ -26,7 +31,6 @@ describe('custom-html', () => {
       },
     }
     handler(fakeEvent)
-    console.log({ executedJS })
     expect(executedJS).toHaveLength(3)
     expect(executedJS[0]).toEqual(
       "const d = document.createElement('div');d.innerHTML = `<p>some text</p>\n" +
