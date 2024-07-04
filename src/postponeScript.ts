@@ -60,13 +60,13 @@ so, for a simple `console.log('hello')` script that needs scripts
 
 */
 
-
-
-
-export function postponeScript(idsOfScriptsToAwait: string[], script_content: string) {
-    return `{const loaded = ${JSON.stringify(
-        Object.fromEntries(idsOfScriptsToAwait.map(id => [id, false]))
-    )};
+export function postponeScript(
+  idsOfScriptsToAwait: string[],
+  script_content: string
+) {
+  return `{const loaded = ${JSON.stringify(
+    Object.fromEntries(idsOfScriptsToAwait.map(id => [id, false]))
+  )};
           let called = false;
 
           const call_if_ready = () => {
@@ -76,11 +76,13 @@ export function postponeScript(idsOfScriptsToAwait: string[], script_content: st
                }
           };
 
-          ${idsOfScriptsToAwait.map(
-            id => `document.addEventListener(
+          ${idsOfScriptsToAwait
+            .map(
+              id => `document.addEventListener(
                       "loaded-${id}",
                       ()=>{ loaded["${id}"] = true;
                       call_if_ready()
-                   }).join(";")`
-    )}}`;
+                   })`
+            )
+            .join(';')}}`
 }
