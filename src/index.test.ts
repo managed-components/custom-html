@@ -2,7 +2,7 @@ import { handler } from './index'
 import { MCEvent } from '@managed-components/types'
 
 describe('custom-html', () => {
-  it('executes html injection', () => {
+  it.only('executes html injection', () => {
     const executedJS: string[] = []
     const fakeEvent = new Event('pageview', {}) as MCEvent
     fakeEvent.payload = {
@@ -26,6 +26,7 @@ describe('custom-html', () => {
       },
     }
     handler(fakeEvent)
+    console.log({ executedJS })
     expect(executedJS).toHaveLength(3)
     expect(executedJS[0]).toEqual(
       "const d = document.createElement('div');d.innerHTML = `<p>some text</p>\n" +
