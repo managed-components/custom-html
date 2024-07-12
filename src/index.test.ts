@@ -37,6 +37,31 @@ describe('custom-html', () => {
     expect(executedJS[2]).toEqual(`console.log('Log 2 from MC')`)
   })
 
+  it('executes simple html with backticks in the script', () => {
+    const executedJS: string[] = []
+    const fakeEvent = new Event('pageview', {}) as MCEvent
+    fakeEvent.payload = {
+      htmlCode: '<div>`some text`</div>',
+    }
+    fakeEvent.client = {
+      emitter: 'browser',
+      userAgent:
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
+      language: 'en-US',
+      referer: '',
+      ip: '127.0.0.1',
+      url: new URL('http://127.0.0.1:1337'),
+      execute: jsString => {
+        executedJS.push(jsString)
+        return true
+      },
+    }
+    handler(fakeEvent)
+    expect(executedJS[0]).toEqual(
+      "const d = document.createElement('div');d.innerHTML = `<div>\\`some text\\`</div>`;document.body.appendChild(d);"
+    )
+  })
+
   it('executes html injection with scripts that wait for other scripts', () => {
     const executedJS: string[] = []
     const fakeEvent = new Event('pageview', {}) as MCEvent

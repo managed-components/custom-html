@@ -53,7 +53,8 @@ export const handler = ({ payload, client }: MCEvent) => {
     client.execute(
       `const d = document.createElement('div');d.innerHTML = \`${$.html()
         .trim()
-        .replaceAll('$', '\\$')}\`;document.body.appendChild(d);`
+        .replaceAll('$', '\\$')
+        .replaceAll('`', '\\`')}\`;document.body.appendChild(d);`
     )
 
     links.forEach(({ attributes }) => {
